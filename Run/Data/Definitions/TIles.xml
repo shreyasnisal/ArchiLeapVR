@@ -1,0 +1,15 @@
+<TileDefinitions>
+	<!-- Grass Block 1x1 -->
+	<TileDefinition name="Block1x1" solid="true" bounds="-0.5,-0.5,0.0,0.5,0.5,1.0">
+		<Model name="Block1x1" path="Data/Models/Tiles/block.obj">
+			<Transform x="0.0,1.0,0.0" y="0.0,0.0,1.0" z="1.0,0.0,0.0" T="0.0,0.0,0.0" />
+		</Model>
+	</TileDefinition>
+	
+	<!-- Dirt Block 1x1 -->
+	<TileDefinition name="Dirt1x1" solid="true" bounds="-0.5,-0.5,0.0,0.5,0.5,1.0">
+		<Model name="Dirt1x1" path="Data/Models/Tiles/blockDirt.obj">
+			<Transform x="0.0,1.0,0.0" y="0.0,0.0,1.0" z="1.0,0.0,0.0" T="0.0,0.0,0.0" />
+		</Model>
+	</TileDefinition>
+</TileDefinitions>

@@ -1,0 +1,4 @@
+ArchiLeapVR was developed for the Master's Thesis course
+in partial fulfillment of the Master of Interactive Technology
+in Digital Game Development with a specialization in
+Software Development at Southern Methodist University, Guildhall.

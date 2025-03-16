@@ -1,0 +1,63 @@
+Jumping and Ledge Grab
+
+You can jump using the right controller A button.
+When jumping, you can grab ledges and pull yourself up-
+to do so, reach out with either hand and use the grip button.
+
+
+Levers
+
+Levers are "Activators" that can trigger moving platforms
+or open doors.
+To move a lever, reach out with either hand and use the grip
+button to grab the handle.
+- Once a lever has been pulled, it stays there and the moving
+platform continues moving or the door stays open.
+
+
+Buttons
+
+Buttons are "Activators" that can trigger moving platforms or
+open doors.
+A moving platform stays moving or a door stays open only as long
+as a button is pressed.
+To press a button, step on it or place a crate on it.
+
+
+Moving Platforms
+
+Moving platforms are "Activatables" that can move in one of three
+directions- X, Y or Z.
+Moving platforms are triggered by "Activators"- buttons or levers.
+
+
+Doors
+
+Doors are "Activatables" that can be open or closed.
+Closed doors do not allow you to pass through, open ones do.
+Doors are triggered by "Activators"- buttons or levers.
+
+
+Crates
+
+Crates are entities that can be pushed or picked up.
+To pick up a crate, reach out with either hand and use the grip
+button to grab them.
+Crates can be placed on buttons to hold them in the pressed position.
+
+
+Orcs
+
+Orcs are enemies that will approach you, deal damage and push you back.
+Orcs aren't very smart, they smell you and try to come towards you-
+they'll often fall to their death.
+You can punch orcs- to do so, make a fist using the grip and trigger
+buttons and swing your hand toward them.
+You can also grab orcs and drop them off platforms- to do so, reach
+out with either hand and use the grip button.
+
+
+Flags
+
+Flags mark the completion of a level- reach one to end the level.
+
