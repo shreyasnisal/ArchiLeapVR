@@ -51,6 +51,14 @@ void Crate::Update()
 		m_position += m_velocity * deltaSeconds;
 		m_acceleration = Vec3::ZERO;
 	}
+
+	if (m_position.z < -10.f)
+	{
+		m_position = m_editorPosition;
+		m_orientation = m_editorOrientation;
+		m_isHeldInLeftHand = false;
+		m_isHeldInRightHand = false;
+	}
 }
 
 void Crate::Render() const

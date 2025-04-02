@@ -1580,53 +1580,22 @@ void Game::InitializeGrid()
 {
 	std::vector<Vertex_PCU> gridVerts;
 
-	constexpr float LINE_HALF_THICKNESS = 0.005f;
-	constexpr float LINE5_HALF_THICKNESS = 0.01f;
-	constexpr float LINE0_HALF_THICKNESS = 0.02f;
 	for (int y = -50; y <= 50; y++)
 	{
 		Rgba8 lineColor = Interpolate(Rgba8::WHITE, Rgba8::TRANSPARENT_WHITE, fabsf((float)y) / 50.f);
 
-		if (y == 0)
-		{
-			AddVertsForGradientLineSegment3D(gridVerts, Vec3::NORTH * (float)y, Vec3::NORTH * (float)y + Vec3::EAST * 50.f, LINE0_HALF_THICKNESS, lineColor);
-			AddVertsForGradientLineSegment3D(gridVerts, Vec3::NORTH * (float)y, Vec3::NORTH * (float)y + Vec3::WEST * 50.f, LINE0_HALF_THICKNESS, lineColor);
-			continue;
-		}
-
-		if (y % 5 == 0)
-		{
-			AddVertsForGradientLineSegment3D(gridVerts, Vec3::NORTH * (float)y, Vec3::NORTH * (float)y + Vec3::EAST * 50.f, LINE5_HALF_THICKNESS, lineColor);
-			AddVertsForGradientLineSegment3D(gridVerts, Vec3::NORTH * (float)y, Vec3::NORTH * (float)y + Vec3::WEST * 50.f, LINE5_HALF_THICKNESS, lineColor);
-			continue;
-		}
-
-		AddVertsForGradientLineSegment3D(gridVerts, Vec3::NORTH * (float)y, Vec3::NORTH * (float)y + Vec3::EAST * 50.f, LINE_HALF_THICKNESS, lineColor);
-		AddVertsForGradientLineSegment3D(gridVerts, Vec3::NORTH * (float)y, Vec3::NORTH * (float)y + Vec3::WEST * 50.f, LINE_HALF_THICKNESS, lineColor);
+		gridVerts.push_back(Vertex_PCU(Vec3::EAST * 50.f + Vec3::NORTH * (float)y, lineColor, Vec2::ZERO));
+		gridVerts.push_back(Vertex_PCU(Vec3::WEST * 50.f + Vec3::NORTH * (float)y, lineColor, Vec2::ZERO));
 	}
 	for (int x = -50; x <= 50; x++)
 	{
 		Rgba8 lineColor = Interpolate(Rgba8::WHITE, Rgba8::TRANSPARENT_WHITE, fabsf((float)x) / 50.f);
 
-		if (x == 0)
-		{
-			AddVertsForGradientLineSegment3D(gridVerts, Vec3::EAST * (float)x, Vec3::EAST * (float)x + Vec3::NORTH * 50.f, LINE0_HALF_THICKNESS, lineColor);
-			AddVertsForGradientLineSegment3D(gridVerts, Vec3::EAST * (float)x, Vec3::EAST * (float)x + Vec3::SOUTH * 50.f, LINE0_HALF_THICKNESS, lineColor);
-			continue;
-		}
-
-		if (x % 5 == 0)
-		{
-			AddVertsForGradientLineSegment3D(gridVerts, Vec3::EAST * (float)x, Vec3::EAST * (float)x + Vec3::NORTH * 50.f, LINE5_HALF_THICKNESS, lineColor);
-			AddVertsForGradientLineSegment3D(gridVerts, Vec3::EAST * (float)x, Vec3::EAST * (float)x + Vec3::SOUTH * 50.f, LINE5_HALF_THICKNESS, lineColor);
-			continue;
-		}
-
-		AddVertsForGradientLineSegment3D(gridVerts, Vec3::EAST * (float)x, Vec3::EAST * (float)x + Vec3::NORTH * 50.f, LINE_HALF_THICKNESS, lineColor);
-		AddVertsForGradientLineSegment3D(gridVerts, Vec3::EAST * (float)x, Vec3::EAST * (float)x + Vec3::SOUTH * 50.f, LINE_HALF_THICKNESS, lineColor);
+		gridVerts.push_back(Vertex_PCU(Vec3::EAST * (float)x + Vec3::NORTH * 50.f, lineColor, Vec2::ZERO));
+		gridVerts.push_back(Vertex_PCU(Vec3::EAST * (float)x + Vec3::SOUTH * 50.f, lineColor, Vec2::ZERO));
 	}
 
-	m_gridVBO = g_renderer->CreateVertexBuffer(gridVerts.size() * sizeof(Vertex_PCU));
+	m_gridVBO = g_renderer->CreateVertexBuffer(gridVerts.size() * sizeof(Vertex_PCU), VertexType::VERTEX_PCU, true);
 	g_renderer->CopyCPUToGPU(gridVerts.data(), gridVerts.size() * sizeof(Vertex_PCU), m_gridVBO);
 }
 
@@ -2424,7 +2393,7 @@ void Game::EnterGame()
 		AABB3 tutorialTriggerBoxButton(Vec3(6.f, 15.f, 4.5f), Vec3(7.f, 16.5f, 6.5f));
 		m_tutorialTriggerBoxesByText[tutorialTextButton] = tutorialTriggerBoxButton;
 
-		std::string tutorialTextCrate = "Push the crate or reach out and use the grip button\nto grab it. Please don't imitate Prof. Stephens and\nthrow it off the ledge, you WILL get soft-locked!\n(Sorry, I'm not a level designer...)";
+		std::string tutorialTextCrate = "Push the crate or reach out and use the grip button\nto grab it";
 		AABB3 tutorialTriggerBoxCrate(Vec3(7.f, 11.f, 4.5f), Vec3(10.f, 12.f, 6.5f));
 		m_tutorialTriggerBoxesByText[tutorialTextCrate] = tutorialTriggerBoxCrate;
 	}
