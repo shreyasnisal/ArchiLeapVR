@@ -97,7 +97,7 @@ void Game::FixedUpdate(float deltaSeconds)
 
 void Game::ClearScreen()
 {
-	Rgba8 clearColor = Rgba8::GRAY;
+	Rgba8 clearColor = Rgba8::BLACK;
 	g_renderer->ClearScreen(clearColor);
 }
 
@@ -154,7 +154,7 @@ ArchiLeapRaycastResult3D Game::RaycastVsScreen(Vec3 const& startPosition, Vec3 c
 	result.m_rayMaxLength = maxDistance;
 
 	float quadHeight = SCREEN_QUAD_DISTANCE / TanDegrees(60.f) * 0.5f;
-	float quadWidth = quadHeight * g_window->GetAspect();
+	float quadWidth = quadHeight * WINDOW_ASPECT;
 
 	Vec3 screenRight = m_screenBillboardMatrix.GetJBasis3D().GetNormalized() * (quadWidth);
 	Vec3 screenUp = m_screenBillboardMatrix.GetKBasis3D().GetNormalized() * (quadHeight);
@@ -237,17 +237,8 @@ void Game::LoadAssets()
 	TileDefinition::CreateFromXml();
 	g_squirrelFont = g_renderer->CreateBitmapFromFile("Data/Images/SquirrelFixedFont");
 	m_gameLogoTexture = g_renderer->CreateOrGetTextureFromFile("Data/Images/ArchiLeap_Temp_Logo.png");
-	m_logoTexture = g_renderer->CreateOrGetTextureFromFile("Data/Images/Logo.png");
-	m_logoSpriteSheet = new SpriteSheet(m_logoTexture, IntVec2(15, 19));
 
 	m_mapImageTexture = g_renderer->CreateOrGetTextureFromFile("Data/Images/LevelImage.jpg");
-
-	m_skyboxTextures[0] = g_renderer->CreateOrGetTextureFromFile("Data/Images/Cubemap+X.png");
-	m_skyboxTextures[1] = g_renderer->CreateOrGetTextureFromFile("Data/Images/Cubemap-X.png");
-	m_skyboxTextures[2] = g_renderer->CreateOrGetTextureFromFile("Data/Images/Cubemap+Y.png");
-	m_skyboxTextures[3] = g_renderer->CreateOrGetTextureFromFile("Data/Images/Cubemap-Y.png");
-	m_skyboxTextures[4] = g_renderer->CreateOrGetTextureFromFile("Data/Images/Cubemap+Z.png");
-	m_skyboxTextures[5] = g_renderer->CreateOrGetTextureFromFile("Data/Images/Cubemap-Z.png");
 }
 
 void Game::InitializeUI()
@@ -776,15 +767,6 @@ void Game::InitializeHowToPlayUI()
 		->SetRaycastTarget(false)
 		->SetScrollable(true)
 		->SetScrollBuffer(200.f);
-
-	//UIWidget* controlsWidgetGameplayText = g_ui->CreateWidget(m_controlsWidgetTabContainers[1]);
-	//controlsWidgetGameplayText->SetText(howToPlayGameplayText)
-	//	->SetPosition(Vec2(0.5f, 1.f))
-	//	->SetDimensions(Vec2(1.f, 2.f))
-	//	->SetPivot(Vec2(0.5f, 1.f))
-	//	->SetAlignment(Vec2(0.5f, 1.f))
-	//	->SetColor(Rgba8::WHITE)
-	//	->SetFontSize(4.f);
 
 	//---------------------------------------------------------------------------------------
 	//---------------------------------------------------------------------------------------
@@ -1645,32 +1627,6 @@ void Game::UpdateHowToPlay()
 	{
 		m_nextState = GameState::MENU;
 	}
-
-	//for (int tabIndex = 0; tabIndex < NUM_HOW_TO_PLAY_TABS; tabIndex++)
-	//{
-	//	if (m_controlsTabIndex == tabIndex)
-	//	{
-	//		m_controlsWidgetTabButtons[tabIndex]->SetBackgroundColor(SECONDARY_COLOR)
-	//			->SetHoverBackgroundColor(SECONDARY_COLOR_VARIANT_LIGHT)
-	//			->SetColor(PRIMARY_COLOR)
-	//			->SetHoverColor(PRIMARY_COLOR_VARIANT_LIGHT)
-	//			->SetBorderColor(PRIMARY_COLOR)
-	//			->SetHoverBorderColor(PRIMARY_COLOR_VARIANT_LIGHT);
-
-	//		m_controlsWidgetTabContainers[tabIndex]->SetVisible(true)->SetFocus(true);
-	//	}
-	//	else
-	//	{
-	//		m_controlsWidgetTabButtons[tabIndex]->SetBackgroundColor(PRIMARY_COLOR)
-	//			->SetHoverBackgroundColor(PRIMARY_COLOR_VARIANT_LIGHT)
-	//			->SetColor(SECONDARY_COLOR)
-	//			->SetHoverColor(SECONDARY_COLOR_VARIANT_LIGHT)
-	//			->SetBorderColor(SECONDARY_COLOR)
-	//			->SetHoverBorderColor(SECONDARY_COLOR_VARIANT_LIGHT);
-
-	//		m_controlsWidgetTabContainers[tabIndex]->SetVisible(false)->SetFocus(false);
-	//	}
-	//}
 }
 
 void Game::UpdateCredits()
@@ -1816,10 +1772,6 @@ void Game::RenderScreenAttract() const
 {
 	g_renderer->BeginRenderEvent("Attract Screen");
 	{
-		const float SCREEN_SIZE_X = SCREEN_SIZE_Y * g_window->GetAspect();
-		const float SCREEN_CENTER_X = SCREEN_SIZE_X * 0.5f;
-		const float SCREEN_CENTER_Y = SCREEN_SIZE_Y * 0.5f;
-
 		std::vector<Vertex_PCU> attractScreenVerts;
 		std::vector<Vertex_PCU> attractScreenTextVerts;
 		std::vector<Vertex_PCU> attractScreenBackgroundVerts;
@@ -1849,12 +1801,10 @@ void Game::RenderMenu() const
 
 void Game::RenderScreenMenu() const
 {
-	AABB2 screenBounds(Vec2::ZERO, Vec2(SCREEN_SIZE_Y * g_window->GetAspect(), SCREEN_SIZE_Y));
-	AABB2 logoBounds = screenBounds.GetBoxAtUVs(Vec2(0.25f, 0.25f), Vec2(1.05f, 0.75f));
-	SpriteAnimDefinition logoBlinkAnimation(m_logoSpriteSheet, 270, 271, 1.f, SpriteAnimPlaybackType::LOOP);
-	SpriteDefinition currentSprite = logoBlinkAnimation.GetSpriteDefAtTime(m_timeInState);
+	AABB2 screenBounds(Vec2::ZERO, Vec2(SCREEN_SIZE_Y * WINDOW_ASPECT, SCREEN_SIZE_Y));
+	AABB2 logoBounds = screenBounds.GetBoxAtUVs(Vec2(0.4f, 0.15f), Vec2(0.9f, 0.65f));
 	std::vector<Vertex_PCU> logoVerts;
-	AddVertsForAABB2(logoVerts, logoBounds, Rgba8::WHITE, currentSprite.GetUVs().m_mins, currentSprite.GetUVs().m_maxs);
+	AddVertsForAABB2(logoVerts, logoBounds, Rgba8::WHITE);
 	g_renderer->SetBlendMode(BlendMode::ALPHA);
 	g_renderer->SetDepthMode(DepthMode::DISABLED);
 	g_renderer->SetModelConstants();
@@ -1862,7 +1812,7 @@ void Game::RenderScreenMenu() const
 	g_renderer->SetRasterizerFillMode(RasterizerFillMode::SOLID);
 	g_renderer->SetSamplerMode(SamplerMode::POINT_CLAMP);
 	g_renderer->BindShader(nullptr);
-	g_renderer->BindTexture(m_logoTexture);
+	g_renderer->BindTexture(m_gameLogoTexture);
 	g_renderer->DrawVertexArray(logoVerts);
 }
 
@@ -1918,7 +1868,7 @@ void Game::RenderScreenGame() const
 	{
 		if (!g_openXR || !g_openXR->IsInitialized())
 		{
-			Vec2 screenCenter(SCREEN_SIZE_Y * g_window->GetAspect() * 0.5f, SCREEN_SIZE_Y * 0.5f);
+			Vec2 screenCenter(SCREEN_CENTER_X, SCREEN_CENTER_Y);
 			std::vector<Vertex_PCU> reticleVerts;
 			AddVertsForDisc2D(reticleVerts, screenCenter, 5.f, Rgba8::RED, Vec2::ZERO, Vec2::ONE, 32);
 			g_renderer->SetBlendMode(BlendMode::ALPHA);
@@ -1935,7 +1885,7 @@ void Game::RenderScreenGame() const
 		if (m_player->m_state == PlayerState::PLAY)
 		{
 			std::vector<Vertex_PCU> healthBarVerts;
-			AABB2 healthBarBounds(Vec2(SCREEN_SIZE_Y * g_window->GetAspect() * 0.05f, SCREEN_SIZE_Y * 0.05f), Vec2(SCREEN_SIZE_Y * g_window->GetAspect() * 0.25f, SCREEN_SIZE_Y * 0.075f));
+			AABB2 healthBarBounds(Vec2(SCREEN_SIZE_Y * WINDOW_ASPECT * 0.05f, SCREEN_SIZE_Y * 0.05f), Vec2(SCREEN_SIZE_Y * g_window->GetAspect() * 0.25f, SCREEN_SIZE_Y * 0.075f));
 			AddVertsForAABB2(healthBarVerts, healthBarBounds, Rgba8::RED);
 			AddVertsForAABB2(healthBarVerts, healthBarBounds.GetBoxAtUVs(Vec2::ZERO, Vec2((float)m_player->m_pawn->m_health / 100.f, 1.f)), Rgba8::GREEN);
 			AddVertsForLineSegment2D(healthBarVerts, healthBarBounds.m_mins, Vec2(healthBarBounds.m_maxs.x, healthBarBounds.m_mins.y), 2.f, PRIMARY_COLOR);
@@ -1956,7 +1906,7 @@ void Game::RenderScreenGame() const
 		if (m_isMapImageVisible)
 		{
 			std::vector<Vertex_PCU> imageVerts;
-			AABB2 screenBounds(Vec2::ZERO, Vec2(SCREEN_SIZE_Y * g_window->GetAspect(), SCREEN_SIZE_Y));
+			AABB2 screenBounds(Vec2::ZERO, Vec2(SCREEN_SIZE_Y * WINDOW_ASPECT, SCREEN_SIZE_Y));
 			AddVertsForAABB2(imageVerts, screenBounds.GetBoxAtUVs(Vec2(0.55f, 0.45f), Vec2(0.95f, 0.85f)), Rgba8::WHITE);
 			g_renderer->SetBlendMode(BlendMode::ALPHA);
 			g_renderer->SetDepthMode(DepthMode::DISABLED);
@@ -2020,7 +1970,7 @@ void Game::RenderWorldScreenQuad() const
 		// Math for rendering screen quad
 		XREye currentEye = g_app->GetCurrentEye();
 		float quadHeight = SCREEN_QUAD_DISTANCE * TanDegrees(30.f) * (currentEye == XREye::NONE ? 1.f : 0.5f);
-		float quadWidth = quadHeight * g_window->GetAspect();
+		float quadWidth = quadHeight * WINDOW_ASPECT;
 
 		// Render screen quad
 		std::vector<Vertex_PCU> screenVerts;
@@ -2174,14 +2124,12 @@ void Game::EnterMenu()
 {
 	m_menuWidget->SetFocus(true);
 	m_menuWidget->SetVisible(true);
-	m_logoAnimationTimer.Start();
 }
 
 void Game::ExitMenu()
 {
 	m_menuWidget->SetFocus(false);
 	m_menuWidget->SetVisible(false);
-	m_logoAnimationTimer.Stop();
 }
 
 void Game::EnterMapSelect()
@@ -2518,7 +2466,7 @@ void Game::RenderSkybox() const
 
 	g_renderer->BeginRenderEvent("Skybox");
 	std::vector<Vertex_PCU> skyboxVerts;
-	AddVertsForQuad3D(skyboxVerts, BRB, BLB, TLB, TRB, Rgba8::WHITE); // +X
+	AddVertsForGradientQuad3D(skyboxVerts, BRB, BLB, TLB, TRB, HORIZON_COLOR, HORIZON_COLOR, AZIMUTH_COLOR, AZIMUTH_COLOR); // +X
 	Mat44 skyboxTransform = Mat44::CreateTranslation3D(m_player->m_position + Vec3::WEST * 0.5f);
 	skyboxTransform.AppendScaleUniform3D(100.f);
 	g_renderer->SetBlendMode(BlendMode::ALPHA);
@@ -2527,42 +2475,42 @@ void Game::RenderSkybox() const
 	g_renderer->SetRasterizerCullMode(RasterizerCullMode::CULL_FRONT);
 	g_renderer->SetRasterizerFillMode(RasterizerFillMode::SOLID);
 	g_renderer->BindShader(nullptr);
-	g_renderer->BindTexture(m_skyboxTextures[0]);
+	g_renderer->BindTexture(nullptr);
 	g_renderer->DrawVertexArray(skyboxVerts);
 
 	skyboxVerts.clear();
-	AddVertsForQuad3D(skyboxVerts, BLF, BRF, TRF, TLF, Rgba8::WHITE); // -X
+	AddVertsForGradientQuad3D(skyboxVerts, BLF, BRF, TRF, TLF, HORIZON_COLOR, HORIZON_COLOR, AZIMUTH_COLOR, AZIMUTH_COLOR); // -X
 	skyboxTransform = Mat44::CreateTranslation3D(m_player->m_position + Vec3::EAST * 0.5f);
 	skyboxTransform.AppendScaleUniform3D(100.f);
-	g_renderer->BindTexture(m_skyboxTextures[1]);
+	g_renderer->BindTexture(nullptr);
 	g_renderer->DrawVertexArray(skyboxVerts);
 
 	skyboxVerts.clear();
-	AddVertsForQuad3D(skyboxVerts, BLB, BLF, TLF, TLB, Rgba8::WHITE); // +Y
+	AddVertsForGradientQuad3D(skyboxVerts, BLB, BLF, TLF, TLB, HORIZON_COLOR, HORIZON_COLOR, AZIMUTH_COLOR, AZIMUTH_COLOR); // +Y
 	skyboxTransform = Mat44::CreateTranslation3D(m_player->m_position + Vec3::SOUTH * 0.5f);
 	skyboxTransform.AppendScaleUniform3D(100.f);
-	g_renderer->BindTexture(m_skyboxTextures[2]);
+	g_renderer->BindTexture(nullptr);
 	g_renderer->DrawVertexArray(skyboxVerts);
 
 	skyboxVerts.clear();
-	AddVertsForQuad3D(skyboxVerts, BRF, BRB, TRB, TRF, Rgba8::WHITE); // -Y
+	AddVertsForGradientQuad3D(skyboxVerts, BRF, BRB, TRB, TRF, HORIZON_COLOR, HORIZON_COLOR, AZIMUTH_COLOR, AZIMUTH_COLOR); // -Y
 	skyboxTransform = Mat44::CreateTranslation3D(m_player->m_position + Vec3::NORTH * 0.5f);
 	skyboxTransform.AppendScaleUniform3D(100.f);
-	g_renderer->BindTexture(m_skyboxTextures[3]);
+	g_renderer->BindTexture(nullptr);
 	g_renderer->DrawVertexArray(skyboxVerts);
 
 	skyboxVerts.clear();
-	AddVertsForQuad3D(skyboxVerts, TLF, TRF, TRB, TLB, Rgba8::WHITE); // +Z
+	AddVertsForQuad3D(skyboxVerts, TLF, TRF, TRB, TLB, AZIMUTH_COLOR); // +Z
 	skyboxTransform = Mat44::CreateTranslation3D(m_player->m_position + Vec3::SKYWARD * 0.5f);
 	skyboxTransform.AppendScaleUniform3D(100.f);
-	g_renderer->BindTexture(m_skyboxTextures[4]);
+	g_renderer->BindTexture(nullptr);
 	g_renderer->DrawVertexArray(skyboxVerts);
 
 	skyboxVerts.clear();
-	AddVertsForQuad3D(skyboxVerts, BLB, BRB, BRF, BLF, Rgba8::WHITE); // -Z
+	AddVertsForQuad3D(skyboxVerts, BLB, BRB, BRF, BLF, HORIZON_COLOR); // -Z
 	skyboxTransform = Mat44::CreateTranslation3D(m_player->m_position + Vec3::GROUNDWARD * 0.5f);
 	skyboxTransform.AppendScaleUniform3D(100.f);
-	g_renderer->BindTexture(m_skyboxTextures[5]);
+	g_renderer->BindTexture(nullptr);
 	g_renderer->DrawVertexArray(skyboxVerts);
 
 	g_renderer->EndRenderEvent("Skybox");

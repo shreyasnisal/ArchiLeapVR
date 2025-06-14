@@ -523,17 +523,18 @@ void Player::HandleKeyboardMouseEditing_Edit()
 			if (groundwardRaycastResult.m_didImpact)
 			{
 				std::vector<Vertex_PCU> dropShadowVerts;
-				float shadowOpacityFloat = RangeMapClamped(groundwardRaycastResult.m_impactDistance, 0.f, 10.f, 1.f, 0.f);
+				float shadowOpacityFloat = RangeMapClamped(groundwardRaycastResult.m_impactDistance, 0.f, 10.f, 0.5f, 0.f);
 				unsigned char shadowOpacity = DenormalizeByte(shadowOpacityFloat);
 				if (shadowOpacityFloat == 1.f)
 				{
 					shadowOpacity = 0;
 				}
-				Vec3 const dropShadowBL = groundwardRaycastResult.m_impactPosition + Vec3::EAST * m_selectedEntity->m_localBounds.m_mins.x * m_selectedEntity->m_scale + Vec3::NORTH * m_selectedEntity->m_localBounds.m_maxs.y * m_selectedEntity->m_scale;
-				Vec3 const dropShadowBR = groundwardRaycastResult.m_impactPosition + Vec3::EAST * m_selectedEntity->m_localBounds.m_mins.x * m_selectedEntity->m_scale + Vec3::NORTH * m_selectedEntity->m_localBounds.m_mins.y * m_selectedEntity->m_scale;
-				Vec3 const dropShadowTR = groundwardRaycastResult.m_impactPosition + Vec3::EAST * m_selectedEntity->m_localBounds.m_maxs.x * m_selectedEntity->m_scale + Vec3::NORTH * m_selectedEntity->m_localBounds.m_mins.y * m_selectedEntity->m_scale;
-				Vec3 const dropShadowTL = groundwardRaycastResult.m_impactPosition + Vec3::EAST * m_selectedEntity->m_localBounds.m_maxs.x * m_selectedEntity->m_scale + Vec3::NORTH * m_selectedEntity->m_localBounds.m_maxs.y * m_selectedEntity->m_scale;
+				Vec3 const dropShadowBL = Vec3::EAST * m_selectedEntity->m_localBounds.m_mins.x * m_selectedEntity->m_scale + Vec3::NORTH * m_selectedEntity->m_localBounds.m_maxs.y * m_selectedEntity->m_scale;
+				Vec3 const dropShadowBR = Vec3::EAST * m_selectedEntity->m_localBounds.m_mins.x * m_selectedEntity->m_scale + Vec3::NORTH * m_selectedEntity->m_localBounds.m_mins.y * m_selectedEntity->m_scale;
+				Vec3 const dropShadowTR = Vec3::EAST * m_selectedEntity->m_localBounds.m_maxs.x * m_selectedEntity->m_scale + Vec3::NORTH * m_selectedEntity->m_localBounds.m_mins.y * m_selectedEntity->m_scale;
+				Vec3 const dropShadowTL = Vec3::EAST * m_selectedEntity->m_localBounds.m_maxs.x * m_selectedEntity->m_scale + Vec3::NORTH * m_selectedEntity->m_localBounds.m_maxs.y * m_selectedEntity->m_scale;
 				AddVertsForQuad3D(m_dropShadowVerts, dropShadowBL, dropShadowBR, dropShadowTR, dropShadowTL, Rgba8(0, 0, 0, shadowOpacity));
+				TransformVertexArrayXY3D(m_dropShadowVerts, 1.f, m_selectedEntity->m_orientation.m_yawDegrees, groundwardRaycastResult.m_impactPosition.GetXY());
 			}
 		}
 	}
@@ -895,7 +896,7 @@ void Player::RenderFakeEntitiesForSpawn() const
 				if (groundwardRaycastResult.m_didImpact)
 				{
 					std::vector<Vertex_PCU> dropShadowVerts;
-					float shadowOpacityFloat = RangeMapClamped(groundwardRaycastResult.m_impactDistance, 0.f, 10.f, 1.f, 0.f);
+					float shadowOpacityFloat = RangeMapClamped(groundwardRaycastResult.m_impactDistance, 0.f, 10.f, 0.5f, 0.f);
 					unsigned char shadowOpacity = DenormalizeByte(shadowOpacityFloat);
 					if (shadowOpacityFloat == 1.f)
 					{

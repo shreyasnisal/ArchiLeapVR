@@ -345,6 +345,14 @@ Vec3 const Entity::GetForwardNormal() const
 	return m_orientation.GetAsMatrix_iFwd_jLeft_kUp().GetIBasis3D();
 }
 
+Mat44 const Entity::GetModelMatrix() const
+{
+	Mat44 result = Mat44::CreateTranslation3D(m_position);
+	result.Append(m_orientation.GetAsMatrix_iFwd_jLeft_kUp());
+	result.AppendScaleUniform3D(m_scale);
+	return result;
+}
+
 OBB3 const Entity::GetBounds() const
 {
 	Vec3 fwd, left, up;

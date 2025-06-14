@@ -18,7 +18,8 @@ Button::Button(Map* map, EntityUID uid, Vec3 const& position, EulerAngles const&
 	: Activator(map, uid, position, orientation, scale, EntityType::BUTTON)
 {
 	m_model = g_modelLoader->CreateOrGetModelFromObj("Data/Models/Activators/buttonSquare", Mat44(Vec3::NORTH, Vec3::SKYWARD, Vec3::EAST, Vec3::ZERO));
-	m_localBounds = AABB3(Vec3(-0.5f, -0.5f, 0.f), Vec3(0.5f, 0.5f, 0.2f));
+	m_localBounds = AABB3(Vec3(-0.25f, -0.25f, 0.f), Vec3(0.25f, 0.25f, 0.1f));
+	m_scale = MODEL_SCALE;
 }
 
 void Button::Update()
@@ -49,7 +50,7 @@ void Button::Render() const
 {
 	Mat44 transform = Mat44::CreateTranslation3D(m_position);
 	transform.Append(m_orientation.GetAsMatrix_iFwd_jLeft_kUp());
-	transform.AppendScaleUniform3D(MODEL_SCALE);
+	transform.AppendScaleUniform3D(m_scale);
 
 	Mat44 knobTransform(transform);
 	knobTransform.AppendTranslation3D(Vec3(0.f, 0.f, m_isPressed ? -0.05f : 0.f));

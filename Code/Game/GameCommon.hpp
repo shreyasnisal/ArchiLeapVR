@@ -38,6 +38,11 @@ extern UISystem*					g_ui;
 extern AudioSystem*					g_audio;
 
 constexpr float SCREEN_SIZE_Y		= 8000.f;
+constexpr float WINDOW_ASPECT = 1.f;
+//constexpr float WINDOW_ASPECT = 0.954167f;
+constexpr float SCREEN_CENTER_X = SCREEN_SIZE_Y * WINDOW_ASPECT * 0.5f;
+constexpr float SCREEN_CENTER_Y = SCREEN_SIZE_Y * 0.5f;
+
 constexpr float NEAR_PLANE_DISTANCE = 0.01f;
 constexpr float FAR_PLANE_DISTANCE = 1000.f;
 
@@ -56,6 +61,9 @@ const Rgba8 SECONDARY_COLOR_VARIANT_DARK(110, 40, 200, 255);
 const Rgba8 TERTIARY_COLOR(50, 220, 230, 255);
 const Rgba8 TERTIARY_COLOR_VARIANT_LIGHT(90, 250, 255, 255);
 const Rgba8 TERTIARY_COLOR_VARIANT_DARK(30, 180, 190, 255);
+
+const Rgba8 HORIZON_COLOR(72, 61, 139, 255);
+const Rgba8 AZIMUTH_COLOR(25, 25, 112, 255);
 
 const Vec3 SUN_DIRECTION = Vec3(1.f, 2.f, -2.f).GetNormalized();
 constexpr float SUN_INTENSITY = 0.9f;

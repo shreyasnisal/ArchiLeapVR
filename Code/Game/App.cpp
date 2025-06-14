@@ -31,9 +31,6 @@ ModelLoader* g_modelLoader = nullptr;
 RandomNumberGenerator* g_rng = nullptr;
 AudioSystem* g_audio = nullptr;
 
-constexpr float WINDOW_ASPECT = 1.f;
-//constexpr float WINDOW_ASPECT = 0.954167f;
-
 
 bool App::HandleQuitRequested(EventArgs& args)
 {
@@ -87,7 +84,8 @@ void App::Startup()
 	WindowConfig windowConfig;
 	windowConfig.m_inputSystem = g_input;
 	windowConfig.m_windowTitle = "ArchiLeapVR";
-	windowConfig.m_clientAspect = WINDOW_ASPECT;
+	//windowConfig.m_clientAspect = WINDOW_ASPECT;
+	windowConfig.m_isFullScreen = true;
 	g_window = new Window(windowConfig);
 
 	RenderConfig renderConfig;
@@ -96,7 +94,7 @@ void App::Startup()
 
 	Camera devConsoleCamera;
 	devConsoleCamera.SetOrthoView(Vec2::ZERO, Vec2(WINDOW_ASPECT, 1.f));
-	devConsoleCamera.SetViewport(Vec2::ZERO, Vec2(SCREEN_SIZE_Y * WINDOW_ASPECT, SCREEN_SIZE_Y));
+	devConsoleCamera.SetViewport(Vec2(0.f, 0.f), Vec2(SCREEN_SIZE_Y * WINDOW_ASPECT, SCREEN_SIZE_Y));
 	DevConsoleConfig devConsoleConfig;
 	devConsoleConfig.m_camera = devConsoleCamera;
 	devConsoleConfig.m_consoleFontFilePathWithNoExtension = "Data/Images/SquirrelFixedFont";
@@ -120,17 +118,6 @@ void App::Startup()
 	modelLoaderConfig.m_renderer = g_renderer;
 	g_modelLoader = new ModelLoader(modelLoaderConfig);
 
-	UISystemConfig uiSystemConfig;
-	uiSystemConfig.m_fontFileNameWithNoExtension = "Data/Fonts/RobotoMonoSemiBold128";
-	uiSystemConfig.m_input = g_input;
-	uiSystemConfig.m_renderer = g_renderer;
-	uiSystemConfig.m_supportKeyboard = false;
-	Camera uiSystemCamera;
-	uiSystemCamera.SetOrthoView(Vec2::ZERO, Vec2(SCREEN_SIZE_Y * WINDOW_ASPECT, SCREEN_SIZE_Y));
-	uiSystemCamera.SetViewport(Vec2(0.f, 0.f), Vec2(SCREEN_SIZE_Y * WINDOW_ASPECT, SCREEN_SIZE_Y));
-	uiSystemConfig.m_camera = uiSystemCamera;
-	g_ui = new UISystem(uiSystemConfig);
-
 	AudioConfig audioConfig;
 	g_audio = new AudioSystem(audioConfig);
 
@@ -140,6 +127,21 @@ void App::Startup()
 	g_renderer->Startup();
 	g_eventSystem->Startup();
 	g_console->Startup();
+
+	UISystemConfig uiSystemConfig;
+	uiSystemConfig.m_fontFileNameWithNoExtension = "Data/Fonts/RobotoMonoSemiBold128";
+	uiSystemConfig.m_input = g_input;
+	uiSystemConfig.m_renderer = g_renderer;
+	uiSystemConfig.m_supportKeyboard = false;
+	Vec2 const viewportTL = Vec2((g_window->GetAspect() - WINDOW_ASPECT) * 0.5f / g_window->GetAspect(), 0.f);
+	Vec2 const viewportDimensions = Vec2(WINDOW_ASPECT / g_window->GetAspect(), 1.f);
+	uiSystemConfig.m_screenBoundsForVRScreen = AABB2(viewportTL, viewportTL + viewportDimensions);
+	Camera uiSystemCamera;
+	uiSystemCamera.SetOrthoView(Vec2::ZERO, Vec2(SCREEN_SIZE_Y * WINDOW_ASPECT, SCREEN_SIZE_Y));
+	uiSystemCamera.SetViewport(Vec2(0.f, 0.f), Vec2(SCREEN_SIZE_Y * WINDOW_ASPECT, SCREEN_SIZE_Y));
+	uiSystemConfig.m_camera = uiSystemCamera;
+	g_ui = new UISystem(uiSystemConfig);
+
 	g_ui->Startup();
 	g_input->Startup();
 	DebugRenderSystemStartup(debugRenderConfig);
@@ -253,18 +255,22 @@ Camera const App::GetCurrentCamera() const
 void App::InitializeCameras()
 {
 	m_worldCamera.SetRenderBasis(Vec3::SKYWARD, Vec3::WEST, Vec3::NORTH);
-	m_worldCamera.SetPerspectiveView(g_window->GetAspect(), 60.f, NEAR_PLANE_DISTANCE, FAR_PLANE_DISTANCE);
+	m_worldCamera.SetPerspectiveView(WINDOW_ASPECT, 60.f, NEAR_PLANE_DISTANCE, FAR_PLANE_DISTANCE);
 	m_worldCamera.SetTransform(Vec3::ZERO, EulerAngles::ZERO);
+	//m_worldCamera.SetViewport(Vec2(SCREEN_CENTER_X - SCREEN_SIZE_Y * WINDOW_ASPECT, 0.f), Vec2(SCREEN_SIZE_Y * WINDOW_ASPECT, SCREEN_SIZE_Y));
+	m_worldCamera.SetNormalizedViewport(Vec2((g_window->GetAspect() - WINDOW_ASPECT) * 0.5f / g_window->GetAspect(), 0.f), Vec2(WINDOW_ASPECT / g_window->GetAspect(), 1.f));
 
 	m_leftWorldCamera.SetRenderBasis(Vec3::SKYWARD, Vec3::WEST, Vec3::NORTH);
 	m_rightWorldCamera.SetRenderBasis(Vec3::SKYWARD, Vec3::WEST, Vec3::NORTH);
 
-	m_screenCamera.SetOrthoView(Vec2::ZERO, Vec2(SCREEN_SIZE_Y * g_window->GetAspect(), SCREEN_SIZE_Y));
-	m_screenCamera.SetViewport(Vec2::ZERO, Vec2(SCREEN_SIZE_Y * g_window->GetAspect(), SCREEN_SIZE_Y));
+
+	m_screenCamera.SetOrthoView(Vec2::ZERO, Vec2(SCREEN_SIZE_Y * WINDOW_ASPECT, SCREEN_SIZE_Y));
+	m_screenCamera.SetViewport(Vec2::ZERO, Vec2(SCREEN_SIZE_Y * WINDOW_ASPECT, SCREEN_SIZE_Y));
 	m_screenRTVTexture = g_renderer->CreateRenderTargetTexture("ScreenTexture", IntVec2(int(SCREEN_SIZE_Y * WINDOW_ASPECT), int(SCREEN_SIZE_Y)));
 
 	m_leftEyeCamera.SetRenderBasis(Vec3::GROUNDWARD, Vec3::WEST, Vec3::NORTH);
 	m_rightEyeCamera.SetRenderBasis(Vec3::GROUNDWARD, Vec3::WEST, Vec3::NORTH);
+
 }
 
 void App::BeginFrame()
@@ -288,7 +294,7 @@ void App::Update()
 	HandleDevInput();
 	m_game->Update();
 
-	DebugAddScreenText(Stringf("FPS: %.0f", 1.f / Clock::GetSystemClock().GetDeltaSeconds()), Vec2(SCREEN_SIZE_Y * g_window->GetAspect() - 48.f, 0.f), 96.f, Vec2(1.f, 0.f), 0.f);
+	DebugAddScreenText(Stringf("FPS: %.0f", 1.f / Clock::GetSystemClock().GetDeltaSeconds()), Vec2(SCREEN_SIZE_Y * WINDOW_ASPECT - 48.f, 0.f), 96.f, Vec2(1.f, 0.f), 0.f);
 }
 
 void App::Render() const

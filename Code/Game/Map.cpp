@@ -647,7 +647,7 @@ bool Map::RemoveEntityFromMap(Entity* entity)
 	{
 		if (m_entities[entityIndex] == entity)
 		{
-			delete m_entities[entityIndex];
+			//delete m_entities[entityIndex];
 			m_entities[entityIndex] = nullptr;
 			return true;
 		}

@@ -498,10 +498,10 @@ void HandController::HandleEditInput()
 
 	float deltaSeconds = m_player->m_game->m_clock.GetDeltaSeconds();
 
-	if (controller.WasThumbRestJustTouched())
-	{
-		m_axisLockDirection = AxisLockDirection(((int)m_axisLockDirection + 1) % (int)AxisLockDirection::NUM);
-	}
+	//if (controller.WasThumbRestJustTouched())
+	//{
+	//	m_axisLockDirection = AxisLockDirection(((int)m_axisLockDirection + 1) % (int)AxisLockDirection::NUM);
+	//}
 	if (controller.WasGripJustPressed())
 	{
 		HandController* otherController = GetOtherHandController();
@@ -690,7 +690,7 @@ void HandController::HandleEditInput()
 				if (groundwardRaycastResult.m_didImpact)
 				{
 					std::vector<Vertex_PCU> dropShadowVerts;
-					float shadowOpacityFloat = RangeMapClamped(groundwardRaycastResult.m_impactDistance, 0.f, 10.f, 1.f, 0.f);
+					float shadowOpacityFloat = RangeMapClamped(groundwardRaycastResult.m_impactDistance, 0.f, 10.f, 0.5f, 0.f);
 					unsigned char shadowOpacity = DenormalizeByte(shadowOpacityFloat);
 					if (shadowOpacityFloat == 1.f)
 					{
@@ -790,17 +790,18 @@ void HandController::HandleEditInput()
 			if (groundwardRaycastResult.m_didImpact)
 			{
 				std::vector<Vertex_PCU> dropShadowVerts;
-				float shadowOpacityFloat = RangeMapClamped(groundwardRaycastResult.m_impactDistance, 0.f, 10.f, 1.f, 0.f);
+				float shadowOpacityFloat = RangeMapClamped(groundwardRaycastResult.m_impactDistance, 0.f, 10.f, 0.5f, 0.f);
 				unsigned char shadowOpacity = DenormalizeByte(shadowOpacityFloat);
 				if (shadowOpacityFloat == 1.f)
 				{
 					shadowOpacity = 0;
 				}
-				Vec3 const dropShadowBL = groundwardRaycastResult.m_impactPosition + Vec3::EAST * m_selectedEntity->m_localBounds.m_mins.x * m_selectedEntity->m_scale + Vec3::NORTH * m_selectedEntity->m_localBounds.m_maxs.y * m_selectedEntity->m_scale;
-				Vec3 const dropShadowBR = groundwardRaycastResult.m_impactPosition + Vec3::EAST * m_selectedEntity->m_localBounds.m_mins.x * m_selectedEntity->m_scale + Vec3::NORTH * m_selectedEntity->m_localBounds.m_mins.y * m_selectedEntity->m_scale;
-				Vec3 const dropShadowTR = groundwardRaycastResult.m_impactPosition + Vec3::EAST * m_selectedEntity->m_localBounds.m_maxs.x * m_selectedEntity->m_scale + Vec3::NORTH * m_selectedEntity->m_localBounds.m_mins.y * m_selectedEntity->m_scale;
-				Vec3 const dropShadowTL = groundwardRaycastResult.m_impactPosition + Vec3::EAST * m_selectedEntity->m_localBounds.m_maxs.x * m_selectedEntity->m_scale + Vec3::NORTH * m_selectedEntity->m_localBounds.m_maxs.y * m_selectedEntity->m_scale;
+				Vec3 const dropShadowBL = Vec3::EAST * m_selectedEntity->m_localBounds.m_mins.x * m_selectedEntity->m_scale + Vec3::NORTH * m_selectedEntity->m_localBounds.m_maxs.y * m_selectedEntity->m_scale;
+				Vec3 const dropShadowBR = Vec3::EAST * m_selectedEntity->m_localBounds.m_mins.x * m_selectedEntity->m_scale + Vec3::NORTH * m_selectedEntity->m_localBounds.m_mins.y * m_selectedEntity->m_scale;
+				Vec3 const dropShadowTR = Vec3::EAST * m_selectedEntity->m_localBounds.m_maxs.x * m_selectedEntity->m_scale + Vec3::NORTH * m_selectedEntity->m_localBounds.m_mins.y * m_selectedEntity->m_scale;
+				Vec3 const dropShadowTL = Vec3::EAST * m_selectedEntity->m_localBounds.m_maxs.x * m_selectedEntity->m_scale + Vec3::NORTH * m_selectedEntity->m_localBounds.m_maxs.y * m_selectedEntity->m_scale;
 				AddVertsForQuad3D(m_dropShadowVerts, dropShadowBL, dropShadowBR, dropShadowTR, dropShadowTL, Rgba8(0, 0, 0, shadowOpacity));
+				TransformVertexArrayXY3D(m_dropShadowVerts, 1.f, m_selectedEntity->m_orientation.m_yawDegrees, groundwardRaycastResult.m_impactPosition.GetXY());
 			}
 		}
 	}
@@ -902,7 +903,7 @@ void HandController::HandleRaycastVsScreen()
 		return;
 	}
 
-	AABB2 screenBounds(Vec2::ZERO, Vec2(SCREEN_SIZE_Y * g_window->GetAspect(), SCREEN_SIZE_Y));
+	AABB2 screenBounds(Vec2::ZERO, Vec2(SCREEN_SIZE_Y * WINDOW_ASPECT, SCREEN_SIZE_Y));
 	ArchiLeapRaycastResult3D raycastVsUIResult = m_player->m_game->RaycastVsScreen(m_worldPosition, m_orientation.GetAsMatrix_iFwd_jLeft_kUp().GetIBasis3D(), CONTROLLER_RAYCAST_DISTANCE);
 	if (raycastVsUIResult.m_didImpact)
 	{
@@ -1114,7 +1115,7 @@ void HandController::RenderFakeEntitiesForSpawn() const
 				if (groundwardRaycastResult.m_didImpact)
 				{
 					std::vector<Vertex_PCU> dropShadowVerts;
-					float shadowOpacityFloat = RangeMapClamped(groundwardRaycastResult.m_impactDistance, 0.f, 10.f, 1.f, 0.f);
+					float shadowOpacityFloat = RangeMapClamped(groundwardRaycastResult.m_impactDistance, 0.f, 10.f, 0.5f, 0.f);
 					unsigned char shadowOpacity = DenormalizeByte(shadowOpacityFloat);
 					if (shadowOpacityFloat == 1.f)
 					{
@@ -1351,7 +1352,6 @@ void HandController::RedoLastAction()
 			if (lastAction.m_createdEntities.empty())
 			{
 				m_player->m_game->m_currentMap->RemoveEntityFromMap(lastAction.m_actionEntity);
-				delete lastAction.m_actionEntity;
 				lastAction.m_actionEntity = nullptr;
 			}
 			else
@@ -1361,7 +1361,6 @@ void HandController::RedoLastAction()
 					Entity*& entity = lastAction.m_createdEntities[entityIndex];
 
 					m_player->m_game->m_currentMap->RemoveEntityFromMap(entity);
-					delete entity;
 					entity = nullptr;
 				}
 			}

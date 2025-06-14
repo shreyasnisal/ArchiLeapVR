@@ -29,6 +29,7 @@ public:
 	virtual void ResetState();
 
 	Vec3 const GetForwardNormal() const;
+	Mat44 const GetModelMatrix() const;
 	OBB3 const GetBounds() const;
 
 	ArchiLeapRaycastResult3D Raycast(Vec3 const& rayStartPos, Vec3 const& fwdNormal, float maxDistance);

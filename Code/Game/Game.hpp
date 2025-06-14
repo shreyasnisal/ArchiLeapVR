@@ -82,8 +82,6 @@ public:
 	Map* m_currentMap = nullptr;
 
 	Texture* m_gameLogoTexture = nullptr;
-	Texture* m_logoTexture = nullptr;
-	SpriteSheet* m_logoSpriteSheet = nullptr;
 
 	Mat44 m_screenBillboardMatrix = Mat44::IDENTITY;
 
@@ -138,7 +136,7 @@ public:
 	UIWidget* m_levelCompleteCoinsCollectedWidget = nullptr;
 	UIWidget* m_levelCompleteCoinsCollectedTextWidget = nullptr;
 
-	Texture* m_skyboxTextures[6] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+	//Texture* m_skyboxTextures[6] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 
 	int m_instructionIndex = -1;
 	bool m_showInstructions = true;
@@ -267,7 +265,7 @@ private:
 
 	VertexBuffer* m_transitionSphereVBO = nullptr;
 	Stopwatch m_transitionTimer = Stopwatch(0.25f);
-	Stopwatch m_logoAnimationTimer = Stopwatch(0.5f);
+	//Stopwatch m_logoAnimationTimer = Stopwatch(0.5f);
 
 private:
 	void ReadPerforceSettings();
